@@ -1,5 +1,15 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    {% if user.is_authenticated %}
+    <form id='post-form' class="card shadow w-50 mt-3 p-3 mx-auto" action="{% url 'newpost' %}" method="post">
+        {% csrf_token %}
+        New Post:
+        <textarea id="post-content" class="form-control" name="post-content"></textarea>
+        <div id="button">
+            <button type="submit" class="btn btn-primary" id="submit-post">Post</button>
+            <button type="reset" class="btn btn-secondary" id="post-reset">Reset</button>
+        </div>
+    </form>
+    {% endif %}
 {% endblock %}

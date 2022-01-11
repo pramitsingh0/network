@@ -1,10 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views import defaults
 
-from .models import User
+
+
+from .models import User, Post
 
 
 def index(request):
@@ -61,3 +64,15 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+########custom functions###########
+
+def newpost(request):
+    if request.method != "POST":
+        return defaults.bad_request(request, exception=None, template_name="400.html")
+    
+    post = request.POST.get('post-content')
+    author = request.user
+    post_model = Post(body=post, author=author)
+    post_model.save()
+    return HttpResponseRedirect(reverse("index"))
