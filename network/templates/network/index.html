@@ -12,4 +12,16 @@
         </div>
     </form>
     {% endif %}
+    <hr>
+
+    {% for post in posts %}
+        <div class="card border-info mb-3 w-50 mx-auto">
+            <div class="card-header">{{post.author}}</div>
+            <div class="card-body">
+                <h5 class="card-title" style="white-space: pre-wrap;">{{post.body}}</h5>
+                <p class="card-text" style="float: left;">{{post.timestamp}} </p>
+                <i class="fa fa-heart" style="float: right; color: grey;"></i>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
