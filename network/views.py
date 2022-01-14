@@ -1,3 +1,4 @@
+from types import NoneType
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
@@ -6,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import defaults
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 
 
@@ -14,9 +16,17 @@ from .models import User, Post, UserFollowing
 
 def index(request):
     posts = Post.objects.all().order_by('-timestamp')
-    
+    page_number = request.POST.get('page_no')
+    try:
+        page_number = int(page_number)
+    except:
+        page_number = 1
+    paginated_posts = Paginator(posts, 5)
+    requested_posts = paginated_posts.get_page(page_number)
     return render(request, "network/index.html", {
-        "posts": posts
+        "posts": requested_posts,
+        "range_of_pages": paginated_posts.page_range,
+        "current_page": page_number,
     })
 
 

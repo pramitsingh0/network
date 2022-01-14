@@ -28,4 +28,25 @@
             </div>
         </div>
     {% endfor %}
+
+    
+    <div class="mx-auto" style="width: fit-content;" class="pagination">
+      {% if posts.has_previous %}
+        <form action="{% url 'index' %}" method="post">
+          {% csrf_token %}
+          <span class="page-item">
+            <button type="submit" value="{{ posts.previous_page_number }}" name="page_no" class="page-item">Previous</button>
+          </span>
+        </form>
+      {% endif %}
+        <form action="{% url 'index' %}" method="post">
+          {% csrf_token %}
+          {% for item in range_of_pages %}
+          <span class="page-item" style="width: 25px;">
+            <input type="submit" value="{{item}}" name="page_no">
+          </span>
+          {% endfor %}
+        </form>
+      </ul>
+    </div>
 {% endblock %}
