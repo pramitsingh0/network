@@ -1,0 +1,66 @@
+{% extends 'network/layout.html' %}
+{% block body %}
+<section class="vh-100" style="background-color: #3FEEE6">
+    <div class="container py-5 ">
+      <div class="row d-flex h-100">
+        <div class="col col-md-9 col-lg-7 col-xl-5">
+          <div class="card" style="border-radius: 15px;">
+            <div class="card-body p-4">
+              <div class="d-flex text-black">
+                <div class="flex-shrink-0">
+                  <img src="https://st4.depositphotos.com/1000507/24489/v/1600/depositphotos_244890858-stock-illustration-user-profile-picture-isolate-background.jpg" alt="Generic placeholder image" class="img-fluid mr-2" style="width: 180px; border-radius: 10px;">
+                </div>
+                <div class="flex-grow-1 ms-3">
+                  <h5 class="mb-1">{{ user_profile.first_name }} {{ user_profile.last_name }}</h5>
+                  <div class="d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                    <div>
+                      <p class="small text-muted mb-1">Posts</p>
+                      <p class="mb-0">{{ user_profile.posts.all.count }}</p>
+                    </div>
+                    <div class="px-3">
+                      <p class="small text-muted mb-1">Followers</p>
+                      <p class="mb-0">{{ user_profile.followers.all.count }}</p>
+                    </div>
+                    <div>
+                      <p class="small text-muted mb-1">Following</p>
+                      <p class="mb-0">{{user_profile.following.all.count}}</p>
+                    </div>
+                  </div>
+                  <div class="d-flex pt-1">
+
+                    
+                    {% if request.user.username != user_profile.username %}
+                      <form action="{% url 'follow' username=user_profile.username %}" method="post">
+                        {% csrf_token %}
+                        {% if is_following %}
+                          <button type="submit" class="btn btn-primary flex-grow-1">Unfollow</button>
+                        {% else %}
+                          <button type="submit" class="btn btn-primary flex-grow-1">Follow</button>
+                        {% endif %}
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      <div class="card p-4 mt-3" style="border-radius: 15px;">
+        {% for post in user_profile.posts.all %}
+        <div class="card border-info mb-3" >
+          <a href="{% url 'profile' username=post.author %}" class="card-header" method='get'>{{post.author}}</a>
+          <div class="card-body">
+              <h5 class="card-title" style="white-space: pre-wrap;">{{post.body}}</h5>
+              <p class="card-text" style="float: left;">{{post.timestamp}} </p>
+              <i class="fa fa-heart" style="float: right; color: grey;">{{ post.likes }}</i>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  
+{% endblock %}

@@ -1,18 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
+from django.http.response import HttpResponseNotFound
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import defaults
+from django.contrib.auth.decorators import login_required
 
 
 
-from .models import User, Post
+from .models import User, Post, UserFollowing
 
 
 def index(request):
     posts = Post.objects.all().order_by('-timestamp')
-
+    
     return render(request, "network/index.html", {
         "posts": posts
     })
@@ -47,6 +49,8 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
+        first_name = request.POST["firstname"]
+        last_name = request.POST["lastname"]
 
         # Ensure password matches confirmation
         password = request.POST["password"]
@@ -59,6 +63,8 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
+            user.first_name = first_name
+            user.last_name = last_name
             user.save()
         except IntegrityError:
             return render(request, "network/register.html", {
@@ -80,3 +86,45 @@ def newpost(request):
     post_model = Post(body=post, author=author)
     post_model.save()
     return HttpResponseRedirect(reverse("index"))
+
+def view_profile(request, username):
+    is_following = False
+    try:
+        follow_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return HttpResponseNotFound("User not found")
+    try:
+        user = User.objects.get(username=request.user.username)
+        if UserFollowing.objects.filter(user_id=user, following_user_id=follow_user):
+            is_following = True
+    except:
+        is_following = False
+    return render(request, "network/profile.html", {
+        "user_profile": follow_user,
+        "is_following": is_following
+        
+    })
+
+@login_required(login_url="login")
+def follow(request, username):
+    try:
+        follow_user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return Http404
+    current_user = User.objects.get(username=request.user.username)
+    if UserFollowing.objects.filter(user_id=current_user, following_user_id=follow_user):
+        follow = UserFollowing.objects.get(user_id=current_user, following_user_id=follow_user)
+        follow.delete()
+    else:
+        UserFollowing.objects.create(user_id=current_user, following_user_id=follow_user)
+    return redirect(view_profile, username=username)
+
+def following_posts(request):
+    user = User.objects.get(username=request.user.username)
+    following = UserFollowing.objects.filter(user_id=user).values('following_user_id')
+    posts = Post.objects.filter(author__in=[follower['following_user_id'] for follower in following])
+    return render(request, "network/index.html", {
+        "posts": posts
+    })
+
+    
