@@ -21,7 +21,7 @@ def index(request):
         page_number = int(page_number)
     except:
         page_number = 1
-    paginated_posts = Paginator(posts, 5)
+    paginated_posts = Paginator(posts, 10)
     requested_posts = paginated_posts.get_page(page_number)
     return render(request, "network/index.html", {
         "posts": requested_posts,

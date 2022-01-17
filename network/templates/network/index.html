@@ -15,12 +15,14 @@
     <hr>
     {% if posts|length < 1 %}
         <h2 class="card border-info mb-3 w-50 mx-auto p-5" style="border-radius: 15px;">
-            Start following users to fetch personal feed.
+            No posts yet
         </h2>
     {% endif %}
     {% for post in posts %}
-        <div class="card border-info mb-3 w-50 mx-auto" style="border-radius: 15px;">
-            <a href="{% url 'profile' username=post.author %}" class="card-header" method='get'>{{post.author}}</a>
+        <div class="card mb-3 w-50 mx-auto" style="border-radius: 15px;">
+            <div class="card-header">
+              <a href="{% url 'profile' username=post.author %}" method='get'>{{post.author}}</a>
+            </div>
             <div class="card-body">
                 <h5 class="card-title" style="white-space: pre-wrap;">{{post.body}}</h5>
                 <p class="card-text" style="float: left;">{{post.timestamp}} </p>
@@ -30,23 +32,33 @@
     {% endfor %}
 
     
-    <div class="mx-auto" style="width: fit-content;" class="pagination">
-      {% if posts.has_previous %}
-        <form action="{% url 'index' %}" method="post">
-          {% csrf_token %}
-          <span class="page-item">
-            <button type="submit" value="{{ posts.previous_page_number }}" name="page_no" class="page-item">Previous</button>
-          </span>
-        </form>
-      {% endif %}
-        <form action="{% url 'index' %}" method="post">
-          {% csrf_token %}
-          {% for item in range_of_pages %}
-          <span class="page-item" style="width: 25px;">
-            <input type="submit" value="{{item}}" name="page_no">
-          </span>
-          {% endfor %}
-        </form>
+    <nav aria-label="Page navigation example" class="mx-auto" style="width: fit-content;">
+      <ul class="pagination">
+        <li class="page-item">
+          {% if posts.has_previous %}
+            <form action="{% url 'index' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" value="{{ posts.previous_page_number }}" name="page_no" class="page-link">Previous</button>
+            </form>
+          {% endif %}
+        </li>
+        <li class="page-item">
+          <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            {% for item in range_of_pages %}
+                <button type="submit" value="{{ item }}" name="page_no" class="page-link" style="float: left; border-radius: 2px;">{{ item }}</button>
+            {% endfor %}
+          </form>
+        </li>
+        <!-- <li class="page-item"><a class="page-link" href="#">Next</a></li> -->
+        {% if posts.has_next %}
+        <li class="page-item">
+          <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" value="{{ posts.next_page_number }}" name="page_no" class="page-link">Next</button>
+          </form>
+        </li>  
+        {% endif %}
       </ul>
-    </div>
+    </nav>
 {% endblock %}
