@@ -1,9 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // handle edit function
     const edit_list = document.querySelectorAll('.fa-edit');
     // for each edit button assign a function reference to handle edit
     edit_list.forEach(button => {
         button.onclick = () => handleEdit(button);
     });
+
+    // call like function
+    const like_list = document.querySelectorAll('.fa-heart');
+    like_list.forEach(button => {
+        button.onclick = () => like_post(button);
+    })
+
 });
 
 const handleEdit = button => {
@@ -53,11 +61,23 @@ const update_post = (post_id) => {
     }). then(response => response.json())
     .then(data => {
         if ("error" in data) {
-            return console.log(data);
+            console.log(data);
+            return location.reload();
         }
         //remove the edit area and add the updated body to card body
         document.querySelector('#edit-card').remove()
         document.querySelector(`#post-no-${post_id}`).querySelector(`h5`).innerHTML = data.updated_post.body;
         document.querySelector(`#post-no-${post_id}`).children[1].style.display = 'block';
+    })
+}
+
+const like_post = (button) => {
+    post_id = button.dataset.postid;
+    console.log(post_id)
+    fetch(`/likepost/${parseInt(post_id)}`)
+    .then(response => response.json())
+    .then(data => {
+        const heart = document.querySelector(`#post-no-${post_id}`).querySelector('.fa-heart')
+        heart.innerHTML = data.likers;
     })
 }

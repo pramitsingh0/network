@@ -6,7 +6,7 @@
   style="border-radius: 15px;">
   {% csrf_token %}
   New Post:
-  <textarea id="post-content" class="form-control" name="post-content"></textarea>
+  <textarea id="post-content" class="form-control" name="post-content" rows="5"></textarea>
   <div id="button">
     <button type="submit" class="btn btn-primary" id="submit-post">Post</button>
     <button type="reset" class="btn btn-secondary" id="post-reset">Reset</button>
@@ -30,7 +30,7 @@
     <div class="card-body" >
       <h5 class="card-title" style="white-space: pre-wrap;" id="post-body">{{post.body}}</h5>
       <p class="card-text" style="float: left;">{{ post.timestamp }} </p>
-      <i class="fa fa-heart" style="float: right; color: grey;" title="Like Post" data-postid="{{post.id}}"></i>
+      <i class="fa fa-heart" style="float: right; color: grey;" title="Like Post" data-postid="{{post.id}}">{{ post.likers.count }}</i>
     </div>
   </div>
   {% endfor %}

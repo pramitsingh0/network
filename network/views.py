@@ -159,3 +159,15 @@ def save_post(request, post_id):
     post.save()
     return JsonResponse({ "updated_post": post.serialize() }, status=200)
     
+
+def like_posts(request, post_id):
+    try: 
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post doesn't exist in the database"}, status=404)
+    if post.likers.filter(id=request.user.id).exists():
+        post.likers.remove(request.user)
+    else:
+        post.likers.add(User.objects.get(username = request.user.username))
+    post.save()
+    return JsonResponse({"likers": post.get_likes_count()})

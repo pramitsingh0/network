@@ -8,3 +8,7 @@
 body {
     background-color: #3feee6;
 }
+
+textarea {
+    resize: none;
+}
