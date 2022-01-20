@@ -11,12 +11,12 @@ class Post(models.Model):
     likers = models.ManyToManyField('User', related_name="liked_posts", default=0)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __serialize__(self):
+    def serialize(self):
         return {
             "id": self.id,
-            "author": self.author,
+            "author": self.author.username,
             "body": self.body,
-            "likes": self.likes.count(),
+            "likes": self.likers.count(),
             "datetime": self.timestamp.strftime("%d-%m-%Y %H:%M:%S")
         }
 

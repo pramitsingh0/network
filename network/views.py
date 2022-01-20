@@ -1,4 +1,3 @@
-from types import NoneType
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
@@ -8,6 +7,8 @@ from django.urls import reverse
 from django.views import defaults
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 
@@ -137,4 +138,24 @@ def following_posts(request):
         "posts": posts
     })
 
+# Save Post API
+@csrf_exempt
+def save_post(request, post_id):
+    # fetch the post from the database, if doesnotexist error then return error message
+    try:
+        post = Post.objects.get(pk=post_id)
+    except Post.DoesNotExist:
+        return JsonResponse({"error": "Post doesn't exist in the database"}, status=404)
+    if request.user != post.author:
+        return JsonResponse({"error": "You cannot edit posts by others"})
+    if request.method != "POST":
+        return JsonResponse({"error": "Only post method accepted."})
+    # load the data sent with the request as body from index.js => update_post => save
+    data = json.loads(request.body)
+    # extract the content from the data sent
+    post_body = data.get("content", "")
+    #update the content in the database
+    post.body = post_body
+    post.save()
+    return JsonResponse({ "updated_post": post.serialize() }, status=200)
     
