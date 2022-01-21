@@ -12,13 +12,15 @@
     <button type="reset" class="btn btn-secondary" id="post-reset">Reset</button>
   </div>
 </form>
-{% endif %}
 <hr>
+{% endif %}
 {% if posts|length < 1 %} <h2 class="card border-info mb-3 w-50 mx-auto p-5" style="border-radius: 15px;">
   No posts yet
   </h2>
   {% endif %}
+  <div id="post-container" class="mt-4">
   {% for post in posts %}
+  
   <div class="card mb-3 w-50 mx-auto" style="border-radius: 15px;" id="post-no-{{ post.id }}">
     <div class="card-header">
       <a href="{% url 'profile' username=post.author %}" method='get'>{{post.author}}</a>
@@ -34,6 +36,7 @@
     </div>
   </div>
   {% endfor %}
+  </div>
 
   <nav aria-label="Page navigation example" class="mx-auto" style="width: fit-content;">
     <ul class="pagination">
